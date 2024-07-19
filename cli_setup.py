@@ -9,6 +9,7 @@ def create_directory_structure(root_dir):
         os.path.join(root_dir, 'gcp_cli_tool', 'sample_functions'),
         os.path.join(root_dir, 'gcp_cli_tool', 'scripts'),
         os.path.join(root_dir, 'gcp_cli_tool', 'tests'),
+        os.path.join(root_dir, 'gcp_cli_tool', 'test_utils'),
         os.path.join(root_dir, 'gcp_cli_tool', 'utils')
     ]
     
@@ -37,7 +38,7 @@ if __name__ == "__main__":
 ''',
         os.path.join(root_dir, 'gcp_cli_tool', 'post_install.py'): '''# Placeholder for post-installation scripts or configuration
 ''',
-        os.path.join(root_dir, 'gcp_cli_tool', 'README.md'): '# GCP CLI Tool\n',
+        os.path.join(root_dir, 'gcp_cli_tool', 'README.md'): '',  # Placeholder for README content
         os.path.join(root_dir, 'gcp_cli_tool', 'requirements.txt'): '''click
 pytest
 ''',
@@ -82,27 +83,26 @@ def test_cli_greet():
     assert result.exit_code == 0
     assert "Hello from the hello command!" in result.output
 ''',
-        os.path.join(root_dir, 'gcp_cli_tool', 'tests', 'test_script.py'): '''import subprocess
-import os
-import pytest
-
-def test_scan_chrome_profiles():
-    """Test the scan_chrome_profiles script."""
-    # Temporarily make sure the script file is executable
-    script_path = os.path.join('gcp_cli_tool', 'scripts', 'scan_chrome_profiles.py')
-    os.chmod(script_path, 0o755)
-    
-    result = subprocess.run(['python3', script_path], capture_output=True, text=True)
-    
-    assert result.returncode == 0
-    assert "Scanning Chrome profiles..." in result.stdout
-''',
-        os.path.join(root_dir, 'gcp_cli_tool', 'tests', 'test_utils.py'): '''from gcp_cli_tool.utils.chrome_utils import get_chrome_profiles
+        os.path.join(root_dir, 'gcp_cli_tool', 'tests', 'test_chrome_utils.py'): '''from gcp_cli_tool.utils.chrome_utils import get_chrome_profiles
 
 def test_get_chrome_profiles():
     """Test the get_chrome_profiles utility function."""
     result = get_chrome_profiles()  # Assuming it returns some value
     assert result is None  # Update this assertion based on actual function behavior
+''',
+        os.path.join(root_dir, 'gcp_cli_tool', 'tests', 'test_display_chrome_profiles.py'): '''# Placeholder for testing display of Chrome profiles
+''',
+        os.path.join(root_dir, 'gcp_cli_tool', 'tests', 'test_gcloud_utils.py'): '''# Placeholder for testing Google Cloud utilities
+''',
+        os.path.join(root_dir, 'gcp_cli_tool', 'tests', 'test_hello.py'): '''# Placeholder for testing hello command
+''',
+        os.path.join(root_dir, 'gcp_cli_tool', 'tests', 'test_sample.py'): '''# Placeholder for testing sample functions
+''',
+        os.path.join(root_dir, 'gcp_cli_tool', 'test_utils', 'test_data_collector.py'): '''# Placeholder for testing data collector utilities
+''',
+        os.path.join(root_dir, 'gcp_cli_tool', 'test_utils', 'test_logger.py'): '''# Placeholder for testing logger utilities
+''',
+        os.path.join(root_dir, 'gcp_cli_tool', 'test_utils', 'test_sheets_exporter.py'): '''# Placeholder for testing sheets exporter utilities
 ''',
         os.path.join(root_dir, 'gcp_cli_tool', 'utils', 'chrome_utils.py'): '''def get_chrome_profiles():
     """Functionality to get Chrome profiles."""
@@ -116,7 +116,8 @@ def test_get_chrome_profiles():
         os.path.join(root_dir, 'gcp_cli_tool', 'commands', '__init__.py'): '',
         os.path.join(root_dir, 'gcp_cli_tool', 'sample_functions', '__init__.py'): '',
         os.path.join(root_dir, 'gcp_cli_tool', 'scripts', '__init__.py'): '',
-        os.path.join(root_dir, 'gcp_cli_tool', 'tests', '__init__.py'): ''
+        os.path.join(root_dir, 'gcp_cli_tool', 'tests', '__init__.py'): '',
+        os.path.join(root_dir, 'gcp_cli_tool', 'test_utils', '__init__.py'): ''
     }
     
     for dir in dirs:
@@ -153,4 +154,3 @@ if __name__ == "__main__":
     create_directory_structure(args.root_dir)
     initialize_git_repo_and_venv(args.root_dir)
     print(f"Project structure created and initialized successfully in '{args.root_dir}'.")
-
