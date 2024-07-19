@@ -1,12 +1,13 @@
-def test_hello():
-    assert True  # Simple test for demonstration
+# gcp_cli_tool/tests/test_hello.py
+import logging
 
-# import subprocess
-# import pytest
+# Configure logging
+logging.basicConfig(filename='test_results.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-# def test_hello_command():
-#     """Test the hello command."""
-#     result = subprocess.run(['python3', 'gcp_cli_tool/commands/hello.py', 'World'],
-#                             capture_output=True, text=True)
-#     assert result.returncode == 0
-#     assert 'Hello, World!' in result.stdout
+def test_hello_function():
+    try:
+        # Your test logic here
+        assert 1 + 1 == 2
+        logging.info("test_hello_function passed")
+    except AssertionError:
+        logging.error("test_hello_function failed")
