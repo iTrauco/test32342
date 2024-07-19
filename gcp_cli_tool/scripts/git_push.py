@@ -12,25 +12,11 @@ def run_command(command, cwd=None):
         sys.exit(1)
 
 def main():
-    if len(sys.argv) not in [2, 3]:
-        print("Usage: python add_branch.py <branch-name> [new-branch-name]")
+    if len(sys.argv) != 2:
+        print("Usage: python add_branch.py <branch-name>")
         sys.exit(1)
 
-    new_branch_name = None
-    if len(sys.argv) == 3:
-        new_branch_name = sys.argv[2]
-    else:
-        # Prompt to create a new branch or use the current branch
-        use_current_branch = input("Use the current branch? [y/N]: ").strip().lower()
-        if use_current_branch == 'y':
-            new_branch_name = subprocess.run("git branch --show-current", check=True, shell=True, text=True, capture_output=True).stdout.strip()
-        else:
-            new_branch_name = input("Enter the name for the new branch: ").strip()
-    
-    # Validate new branch name
-    if not new_branch_name:
-        print("Branch name cannot be empty.")
-        sys.exit(1)
+    new_branch_name = sys.argv[1]
 
     # Get the current working directory (existing repo)
     existing_repo_path = os.getcwd()
@@ -38,8 +24,8 @@ def main():
     # Prompt for the repo URL
     default_url = "https://github.com/iTrauco/geek-cli.git"
     use_default = input(f"Use default repo URL ({default_url})? [y/N]: ").strip().lower()
-    
-    if use_default == 'y':
+
+    if use_default == 'y' or use_default == '':
         repo_url = default_url
     else:
         repo_url = input("Enter the URL of the local repository: ").strip()
@@ -74,6 +60,13 @@ def main():
     if not commit_message:
         commit_message = "workflow testing, nothing special..."
     run_command(f"git commit -m \"{commit_message}\"", cwd=existing_repo_path)
+    
+    # Check if the origin remote exists
+    try:
+        subprocess.run("git remote get-url origin", cwd=existing_repo_path, check=True, shell=True, text=True, capture_output=True)
+    except subprocess.CalledProcessError:
+        print("Error: Remote 'origin' does not exist. Please set up a remote named 'origin' before pushing.")
+        sys.exit(1)
     
     # Push the new branch to the remote repository
     run_command(f"git push origin {new_branch_name}", cwd=existing_repo_path)
