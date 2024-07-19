@@ -9,6 +9,7 @@ def create_directory_structure(root_dir):
         os.path.join(root_dir, 'gcp_cli_tool', 'sample_functions'),
         os.path.join(root_dir, 'gcp_cli_tool', 'scripts'),
         os.path.join(root_dir, 'gcp_cli_tool', 'tests'),
+        os.path.join(root_dir, 'gcp_cli_tool', 'test_utils'),
         os.path.join(root_dir, 'gcp_cli_tool', 'utils')
     ]
     
@@ -29,6 +30,13 @@ def greet():
 if __name__ == "__main__":
     cli()
 ''',
+
+ os.path.join(root_dir, 'gcp_cli_tool', 'pytest.ini'): '''
+[pytest]
+pythonpath = .
+''',
+
+
         os.path.join(root_dir, 'gcp_cli_tool', 'commands', 'hello.py'): '''def hello():
     """Print a hello message."""
     print("Hello from the hello command!")
@@ -72,6 +80,21 @@ setup(
 ''',
         os.path.join(root_dir, 'gcp_cli_tool', 'tests', 'conftest.py'): '''# Configuration file for pytest, if needed
 ''',
+        os.path.join(root_dir, 'gcp_cli_tool', 'tests', 'test_hello.py'): '''# tests/test_hello.py
+import pytest
+from gcp_cli_tool.commands.hello import say_hello
+from gcp_cli_tool.utils.logging_utils import setup_logger
+
+# Setup logger
+logger = setup_logger()
+
+def test_say_hello():
+    logger.info("Running test_say_hello")
+    result = say_hello("World")
+    assert result == "Hello, World!"
+    logger.info("Test passed!")
+''',
+
         os.path.join(root_dir, 'gcp_cli_tool', 'tests', 'test_cli.py'): '''from click.testing import CliRunner
 from gcp_cli_tool.cli import cli
 
@@ -112,11 +135,37 @@ def test_get_chrome_profiles():
     """Functionality to get Google Cloud info."""
     pass
 ''',
+        os.path.join(root_dir, 'gcp_cli_tool', 'utils', 'logging_utils.py'): '''import logging
+import os
+
+def setup_logger(log_file='test_results.log'):
+    """Set up a logger to output messages to a file."""
+    log_dir = os.path.dirname(log_file)
+    if not os.path.exists(log_dir):
+        os.makedirs(log_dir)
+
+    logger = logging.getLogger()
+    logger.setLevel(logging.INFO)
+
+    file_handler = logging.FileHandler(log_file)
+    file_handler.setLevel(logging.INFO)
+
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    file_handler.setFormatter(formatter)
+
+    logger.addHandler(file_handler)
+
+    return logger
+
+''',
+        os.path.join(root_dir, 'gcp_cli_tool', '__init__.py'): '',
         os.path.join(root_dir, 'gcp_cli_tool', 'utils', '__init__.py'): '',
         os.path.join(root_dir, 'gcp_cli_tool', 'commands', '__init__.py'): '',
         os.path.join(root_dir, 'gcp_cli_tool', 'sample_functions', '__init__.py'): '',
         os.path.join(root_dir, 'gcp_cli_tool', 'scripts', '__init__.py'): '',
-        os.path.join(root_dir, 'gcp_cli_tool', 'tests', '__init__.py'): ''
+        os.path.join(root_dir, 'gcp_cli_tool', 'tests', '__init__.py'): '',
+        os.path.join(root_dir, 'gcp_cli_tool', 'test_utils', '__init__.py'): '',
+        os.path.join(root_dir, 'gcp_cli_tool', 'scripts', '__init__.py'): '',
     }
     
     for dir in dirs:
@@ -126,24 +175,48 @@ def test_get_chrome_profiles():
         with open(file, 'w') as f:
             f.write(content)
 
-def initialize_git_repo_and_venv(root_dir):
-    absolute_root_dir = os.path.abspath(root_dir)
-    subprocess.run(["git", "init", absolute_root_dir], check=True)
-    subprocess.run(["git", "-C", absolute_root_dir, "add", "."], check=True)
-    subprocess.run(["git", "-C", absolute_root_dir, "commit", "-m", "Initial commit"], check=True)
+# def initialize_git_repo_and_venv(root_dir):
+#     absolute_root_dir = os.path.abspath(root_dir)
+#     subprocess.run(["git", "init", absolute_root_dir], check=True)
+#     subprocess.run(["git", "-C", absolute_root_dir, "add", "."], check=True)
+#     subprocess.run(["git", "-C", absolute_root_dir, "commit", "-m", "Initial commit"], check=True)
     
-    # Create and activate a virtual environment
-    venv_path = os.path.join(absolute_root_dir, 'venv')
+#     # Create and activate a virtual environment
+#     venv_path = os.path.join(absolute_root_dir, 'venv')
+#     subprocess.run(["python3", "-m", "venv", venv_path], check=True)
+    
+#     pip_path = os.path.join(venv_path, 'bin', 'pip')
+#     requirements_path = os.path.join(absolute_root_dir, 'gcp_cli_tool', 'requirements.txt')
+    
+#     # Install requirements
+#     subprocess.run([pip_path, "install", "-r", requirements_path], check=True)
+    
+#     # Open VS Code
+#     subprocess.run(["code", "."], cwd=absolute_root_dir, check=True)
+
+def initialize_git_repo_and_venv(project_dir):
+    """Initialize a Git repository and create a virtual environment in the project directory."""
+    # Ensure the new project directory exists
+    os.makedirs(project_dir, exist_ok=True)
+    
+    # Initialize Git repository
+    subprocess.run(["git", "init", project_dir], check=True)
+    
+    # Create the virtual environment
+    venv_path = os.path.join(project_dir, 'venv')  # Set path within the new project directory
     subprocess.run(["python3", "-m", "venv", venv_path], check=True)
     
-    pip_path = os.path.join(venv_path, 'bin', 'pip')
-    requirements_path = os.path.join(absolute_root_dir, 'gcp_cli_tool', 'requirements.txt')
+    # Activate the virtual environment
+    # For Unix-based systems, activation is done manually after setup
+    # For Windows, activation might need a different approach
+
+    # # Install dependencies
+    # pip_path = os.path.join(venv_path, 'bin', 'pip')  # For Unix-based systems
+    # # pip_path = os.path.join(venv_path, 'Scripts', 'pip.exe')  # For Windows
+    # subprocess.run([pip_path, "install", "-r", os.path.join(project_dir, 'requirements.txt')], check=True)
     
-    # Install requirements
-    subprocess.run([pip_path, "install", "-r", requirements_path], check=True)
-    
-    # Open VS Code
-    subprocess.run(["code", "."], cwd=absolute_root_dir, check=True)
+    print(f"Git repository and virtual environment have been set up in {project_dir}.")
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Set up a new project structure.')
@@ -153,4 +226,3 @@ if __name__ == "__main__":
     create_directory_structure(args.root_dir)
     initialize_git_repo_and_venv(args.root_dir)
     print(f"Project structure created and initialized successfully in '{args.root_dir}'.")
-
